@@ -4,7 +4,7 @@ WeeMutter
 Send push notifications to [Mutter](https://www.mutterirc.com/) from
 [Weechat](https://weechat.org/). (This is because I don't use
 ZNC as my Bouncer, so I can't use the
-[Mutter ZNC Module](https://bitbucket.org/jmclough/mutter-push/overview).
+[Mutter ZNC Module](https://bitbucket.org/jmclough/mutter-push/overview)).
 
 ##To use
 Get your apple push token for mutter. I may eventually automate this,
