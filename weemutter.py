@@ -15,6 +15,10 @@ SCRIPT_VERSION = '0.0'
 SCRIPT_LICENSE = 'ISC'
 SCRIPT_DESC = 'Send push notifs to mutter for iOS'
 
+ONLY_AWAY = True  ##only send notifications if away
+LIMIT_RATE_TO = 20 ## rate limit, in seconds
+RATE_LIMITED = False ##awful global; don't touch!!!
+
 script_options = {
         'api_key' : '',
         'only_away' : ''
@@ -29,6 +33,12 @@ def send_notif(body):
     title = SCRIPT_NAME
     version = MUTTER_VERSION
     token = MUTTER_TOKEN
+    if LIMIT_RATE_TO > 0:
+        #weechat.prnt("", "enable rate limit")
+        timer = LIMIT_RATE_TO * 1000
+        global RATE_LIMITED
+        RATE_LIMITED = True
+        weechat.hook_timer( timer , 0, 1, "rate_limit_cb", "")
     session = requests.Session()
     session.headers['User-Agent'] = MUTTER_USER_AGENT
     alert = { 'title' : title, 'body' : body }
@@ -41,7 +51,7 @@ def send_notif(body):
              self.remove_token_from_networks(expired_token)
 
 def weemutter_cb(data, buf, args):
-    #weechat.prnt("",args) #clearly for debug
+    #weechat.prnt("",args)
     send_notif(args)
     return weechat.WEECHAT_RC_OK;
 
@@ -49,10 +59,21 @@ def weemutter_cb(data, buf, args):
 def print_cb(data, buf, date, tags, displayed, highlight, prefix, message):
     if highlight != 1 and weechat.buffer_get_string( buf, "localvar_type") != "private":
         return weechat.WEECHAT_RC_OK
+    if ONLY_AWAY == True and len(weechat.buffer_get_string(buf, "localvar_away")) == 0:
+        return weechat.WEECHAT_RC_OK
+    if RATE_LIMITED == True:
+        #weechat.prnt("", "I've been rate limited")
+        return weechat.WEECHAT_RC_OK
     bufname = weechat.buffer_get_string(buf, "short_name")
     msg = "[%s] <%s> %s" % (bufname, prefix, message)
     send_notif(msg)
-    #weechat.prnt("", msg ) #clearly for debug
+    #weechat.prnt("", msg )
+    return weechat.WEECHAT_RC_OK
+
+def rate_limit_cb(data, remain):
+    global RATE_LIMITED
+    RATE_LIMITED = False
+    #weechat.prnt("", "Turning off Rate limiting")
     return weechat.WEECHAT_RC_OK
 
 #eventual support for in-weechat config.
@@ -61,10 +82,8 @@ def init_config():
 
 
 #eventually should add support for live reconfiguration.
-def config_cb(pointer, name, value):
+def config_cb(name, value):
     return weechat.WEECHAT_RC_OK;
-
-
 
 if weechat.register(SCRIPT_NAME, SCRIPT_AUTHOR, SCRIPT_VERSION, SCRIPT_LICENSE, SCRIPT_DESC, "", ""):
     #hooks
