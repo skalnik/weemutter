@@ -6,7 +6,7 @@ Send push notifications to [Mutter](https://www.mutterirc.com/) from
 ZNC as my Bouncer, so I can't use the
 [Mutter ZNC Module](https://bitbucket.org/jmclough/mutter-push/overview)).
 
-##To use
+## To use
 Get your apple push token for mutter. I may eventually automate this,
 but since Weechat's relay doesn't seem to have an easy way of adding
 server CAPs, it can't be automated in the way that it is for the ZNC
@@ -34,18 +34,18 @@ to connect to it, and tell it you support the ```mutterirc.com/push``` CAP.
 That long numeric string is the token. Set it as ```MUTTER_TOKEN = ''``` in
 the script.
 
-##Config Options
+## Config Options
 
 - ```MUTTER_TOKEN = ''``` Yeah. this is important.
 - ```ONLY_AWAY = True``` Only send notifications if away
 - ```LIMIT_RATE_TO = 20``` Don't send more than one notification in 20 seconds
 
-##Features
+## Features
 
 - It sends push notifications
 - Rate limiting, to not annoy blipz.
 
-##Bugs
+## Bugs
 
 - No in-Weechat configuration
 - No easy way to get tokens
